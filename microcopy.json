@@ -1,0 +1,43 @@
+{
+  "warning_banner_variants": [
+    "Warning: This may expose professional mistakes. Proceed only if you have thick skin.",
+    "Don't click unless you can handle brutal honesty.",
+    "Brace yourself. Things are about to get real... and slightly embarrassing."
+  ],
+  "cta_variants": {
+    "primary": "Let's see what I did in 2025?",
+    "secondary": "Unleash Shame"
+  },
+  "loading_messages": [
+    "Fetching your commits...",
+    "Counting your sins...",
+    "Composing roast...",
+    "Preparing the shame..."
+  ],
+  "error_messages": {
+    "user_not_found": "User not found. Check the username and try again.",
+    "rate_limit": "GitHub rate limit exceeded. Wait a minute and try again.",
+    "empty_year": "Quiet year. Too stealthy. No shame to dish."
+  },
+  "footer_quip": "© 2025 GitShame. All roasts are fictional. Mostly.",
+  "repo_url": "https://github.com/nahinio/gitshame",
+  "share_captions": [
+    "I survived GitShame 2025 and it was... complicated.",
+    "GitHub just told me the truth. I'm not okay.",
+    "My commits have been roasted. Send help."
+  ],
+  "tooltip_help": "Enter a public GitHub username to see their year in review... roasted.",
+  "empty_state_message": "Enter a GitHub username above to get started.",
+  "json_schema_example": {
+    "warning_message": "<short sarcastic warning at top>",
+    "slides": [
+      { "title": "Commit Crimes", "text_variations": ["...", "...", "..."], "stat": "123 Commits" },
+      { "title": "Bug Bodycount", "text_variations": ["...", "...", "..."], "stat": "5 Issues" },
+      { "title": "PR Survival", "text_variations": ["...", "...", "..."], "stat": "10 Merged / 12 Opened" },
+      { "title": "Commit Syntax", "text_variations": ["...", "...", "..."], "stat": "Actual Commit Msg" }
+    ],
+    "final_verdict": {
+      "summary_variations": ["...", "...", "..."]
+    }
+  }
+}
