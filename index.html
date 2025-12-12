@@ -178,13 +178,21 @@
 
       .logo {
         font-family: var(--font-display);
-        font-size: clamp(4rem, 15vw, 10rem);
-        letter-spacing: 6px;
-        background: linear-gradient(180deg, #fff 0%, var(--accent-red) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 40px rgba(255, 59, 59, 0.4));
+        font-size: 1rem; /* small textual fallback if images aren't loaded */
+        letter-spacing: 0;
+        background: none;
+        -webkit-text-fill-color: initial;
+        filter: none;
+        line-height: 0;
+      }
+
+      /* Fallback for the image logo if browser ignores external stylesheet */
+      .logo img {
+        display: block;
+        margin: 0 auto;
+        width: auto;
+        height: auto;
+        max-width: 100%;
       }
 
       .tagline {
@@ -976,6 +984,7 @@
         display: none !important;
       }
     </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
 
   <body>
@@ -989,10 +998,9 @@
       <main class="hero" id="heroSection">
         <h1 class="logo">
           <a href="/" aria-label="gitshame homepage" class="logo-link">
-            <img src="assets/gitshame.png" alt="gitshame" width="400" />
+            <img src="assets/gitshame.png" class="logo-img" alt="gitshame" />
           </a>
-
-          <!-- Keep the textual brand for screen readers -->
+          <!-- Accessible label provided on the link; no visible text needed -->
         </h1>
         <p class="tagline">
           Your year in code. <span class="red">Brutally roasted.</span>
@@ -1591,7 +1599,6 @@
           this.els.export.innerHTML = `
                     <div class="export-layout" id="exportLayout" style="font-family: 'Inter', sans-serif;">
                         <div class="export-header">
-                            <img src="assets/gitshame.png" class="export-logo-img" alt="gitshame">
                             <img src="${
                               u.avatar_url
                             }" class="export-avatar" crossorigin="anonymous" id="exportAvatar">
@@ -1642,7 +1649,7 @@
                             <div style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: #ff3b3b; letter-spacing: 1px; text-transform: none; margin-bottom: 20px;">Final Verdict</div>
                             <div style="font-family: var(--font-display); font-size: 2.8rem; color: #fff; line-height: 1.2; letter-spacing: 0.4px;">${r.getVerdict()}</div>
                         </div>
-                        <div class="export-footer"><img src="assets/gitshame.png" alt="gitshame" class="export-logo-img"/></div>
+                        <div class="export-footer"></div>
                     </div>
                 `;
 
@@ -1655,15 +1662,7 @@
               setTimeout(resolve, 3000); // Timeout fallback
             });
           }
-          // Wait for export logo to load as well
-          const exportLogo = document.querySelector(".export-logo-img");
-          if (exportLogo && !exportLogo.complete) {
-            await new Promise((resolve) => {
-              exportLogo.onload = resolve;
-              exportLogo.onerror = resolve;
-              setTimeout(resolve, 3000);
-            });
-          }
+          // No export logo to wait for (export images should be logo-free)
 
           // Brief delay for fonts to render (give the head fonts a little extra time so they raster correctly)
           await new Promise((r) => setTimeout(r, 1000));

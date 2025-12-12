@@ -10,13 +10,14 @@
     --font-display: 'Bungee', 'Bebas Neue', sans-serif;
     --font-value: 'Bebas Neue', sans-serif;
     --spacing-unit: 8px;
-    /* Logo sizing */
-    --logo-size: 160px;
-    --logo-size-mobile: 120px;
-    --logo-size-story: 120px;
-    --logo-size-export: 120px;
-    --logo-glow-size: 220px;
-    --logo-glow-size-mobile: 180px;
+    /* Logo sizing — exact responsive widths for consistent appearance */
+    --logo-width-desktop: 240px;
+    --logo-width-tablet: 160px;
+    --logo-width-mobile: 120px;
+    --logo-size-story: clamp(64px, 8vw, 140px);
+    --logo-size-export: 0px; /* export should not show logo */
+    --logo-glow-size: 80px;
+    --logo-glow-size-mobile: 60px;
 }
 
 * {
@@ -25,26 +26,14 @@
     padding: 0;
 }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    display: flex;
-    letter-spacing: 0.4px;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-}
-
 #app {
     width: 100%;
     max-width: 600px;
     /* Mobile focused max-width */
     margin: 0 auto;
-    padding: 0;
-    display: flex;
-    align-items: center;
+    --logo-width-desktop: 220px;
+    --logo-width-tablet: 140px;
+    --logo-width-mobile: 64px;
 }
 
 .warning-banner {
@@ -52,6 +41,7 @@ body {
     color: #000;
     width: 100%;
     padding: 12px;
+.hero { min-height: 70vh; padding-top: 20px; padding-bottom: 20px; }
     font-weight: 600;
     font-size: 0.9rem;
     text-transform: none;
@@ -68,9 +58,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    padding: 24px;
-    text-align: center;
+        padding: 0;
+        display: flex;
+        align-items: center;
 }
 
 .logo-title {
@@ -83,11 +73,30 @@ body {
 
 .logo {
     font-family: var(--font-heading);
-    font-size: 3.5rem;
     font-weight: 700;
     letter-spacing: -1px;
     margin-bottom: 0.5rem;
-}
+    }
+
+    /* HERO */
+    .hero, .hero-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 20px;
+        text-align: center;
+        gap: 14px;
+    }
+
+    .logo {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        letter-spacing: -1px;
+        margin-bottom: 0.5rem;
+        font-size: 0; /* hide textual fallback so the image replaces it visually */
+    }
 
 /* Visually hidden text for screen reader accessibility */
 .sr-only {
@@ -97,15 +106,21 @@ body {
 }
 
 /* Logo image styling */
-.logo-link { display: inline-block; text-decoration: none; position: relative; }
+.logo-link { display: inline-block; text-decoration: none; position: relative; line-height: 0; }
 .logo-img {
-    display: inline-block;
-    max-width: var(--logo-size);
+    display: block;
+    margin: 0 auto;
+    width: clamp(var(--logo-width-mobile), 12vw, var(--logo-width-desktop));
     height: auto;
-    transition: transform 0.18s ease, filter 0.18s ease;
-    filter: drop-shadow(0 8px 18px rgba(0,0,0,0.5));
-    max-height: 80px;
+    object-fit: contain;
+    transition: width 160ms ease;
+    max-width: 100%;
 }
+
+/* Force consistent presentation on the homepage */
+.hero .logo-img { margin-bottom: 20px; }
+.hero .logo-link::after { display: none; }
+.logo-link:hover .logo-img, .logo-link:focus .logo-img { transform: none; }
 
 /* Decorative glow behind logo */
 .logo-link::after {
@@ -126,19 +141,40 @@ body {
 
 /* Hover and focus states create lively emphasis */
 .logo-link:hover .logo-img, .logo-link:focus .logo-img {
-    transform: translateY(-3px) scale(1.02);
-    filter: drop-shadow(0 18px 36px rgba(255,59,59,0.12));
+    transform: translateY(-2px) scale(1.01);
+    filter: drop-shadow(0 12px 24px rgba(255,59,59,0.08));
 }
 
 /* Logo sizing for smaller screens */
 @media (max-width: 480px) {
-    .logo-img { max-width: var(--logo-size-mobile); }
-    .logo-link::after { width: var(--logo-glow-size-mobile); height: var(--logo-glow-size-mobile); bottom: -30px; }
+    .logo-img { width: var(--logo-width-mobile); }
+    .logo-link::after { width: var(--logo-glow-size-mobile); height: var(--logo-glow-size-mobile); bottom: -28px; }
+}
+
+@media (min-width: 481px) and (max-width: 900px) {
+    .logo-img { width: var(--logo-width-tablet); }
+}
+
+/* Ensure hero padding targets the actual hero element */
+/* Handled earlier: keep the main .hero rule for spacing */
+
+/* Extra small screens: keep it tiny */
+@media (max-width: 360px) {
+    .logo-img { width: calc(var(--logo-width-mobile) * 0.85); }
 }
 
 /* Story and export logos */
 .story-logo-img { max-width: var(--logo-size-story); height: auto; display: block; margin: 0 auto; }
-.export-logo-img { max-width: var(--logo-size-export); height: auto; display: inline-block; }
+.export-logo-img { max-width: var(--logo-size-export); height: auto; display: none !important; }
+
+/* Ensure exports never render site UI logos (safety net) */
+.export-layout .logo-img, .export-layout .logo-link, .export-layout .export-logo-img {
+    display: none !important;
+}
+
+/* Tighter hero spacing and centered placement for the homepage */
+.hero-section { padding-top: 14px; padding-bottom: 14px; }
+.logo { margin-bottom: 0.25rem; }
 
 /* Make headings and major UI elements use normal casing and gentle spacing */
 h1, h2, h3, h4, h5, h6, p, a, button, .stat-card .label, .label {
@@ -435,10 +471,7 @@ input[type="text"]:focus {
     align-items: center;
     justify-content: center;
 }
-.export-logo-img {
-    max-width: 180px;
-    opacity: 0.95;
-}
+.export-logo-img { display: none !important; }
 
 .story-header h1 {
     font-family: var(--font-heading);
