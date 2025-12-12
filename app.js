@@ -249,7 +249,9 @@ class UIController {
             prevBtn: document.getElementById('prevBtn'),
             nextBtn: document.getElementById('nextBtn'),
             indicators: document.getElementById('slideIndicators'),
-            pngContainer: document.getElementById('pngExportContainer')
+                pngContainer: document.getElementById('pngExportContainer'),
+                notFound: document.getElementById('notFound'),
+                tryAgainBtn: document.getElementById('tryAgainBtn')
         };
 
         this.state = {
@@ -273,6 +275,15 @@ class UIController {
         this.elements.btn.addEventListener('click', () => this.handleRoast());
         this.elements.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleRoast();
+        });
+        if (this.elements.tryAgainBtn) {
+            this.elements.tryAgainBtn.addEventListener('click', () => this.hideUserNotFound());
+        }
+        // Close not-found on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.elements.notFound && !this.elements.notFound.classList.contains('hidden')) {
+                this.hideUserNotFound();
+            }
         });
         this.elements.prevBtn.addEventListener('click', () => this.changeSlide(-1));
         this.elements.nextBtn.addEventListener('click', () => this.changeSlide(1));
@@ -306,9 +317,15 @@ class UIController {
 
         } catch (error) {
             console.error(error);
-            this.elements.warning.querySelector('.warning-text').textContent = error.message || "Error: User not found or API limits hit.";
-            this.setLoading(false);
-            this.elements.hero.classList.remove('hidden');
+                const msg = (error && error.message) ? error.message : "Error: User not found or API limits hit.";
+                if (msg === 'User not found') {
+                    this.setLoading(false);
+                    this.showUserNotFound();
+                } else {
+                    this.elements.warning.querySelector('.warning-text').textContent = msg;
+                    this.setLoading(false);
+                    this.elements.hero.classList.remove('hidden');
+                }
         }
     }
 
@@ -327,6 +344,7 @@ class UIController {
             this.elements.hero.classList.add('hidden');
             this.elements.loading.classList.remove('hidden');
             this.elements.slidesContainer.classList.add('hidden');
+            if (this.elements.notFound) this.elements.notFound.classList.add('hidden');
         } else {
             this.elements.loading.classList.add('hidden');
             if (this.loadingInterval) clearInterval(this.loadingInterval);
@@ -336,6 +354,31 @@ class UIController {
     showSlides() {
         this.elements.hero.classList.add('hidden');
         this.elements.slidesContainer.classList.remove('hidden');
+        if (this.elements.notFound) this.elements.notFound.classList.add('hidden');
+    }
+
+    showUserNotFound() {
+        if (this.elements.notFound) {
+            this.elements.notFound.classList.remove('hidden');
+            // add a 'show' class for CSS animation triggers
+            this.elements.notFound.classList.add('show');
+        }
+        if (this.elements.slidesContainer) this.elements.slidesContainer.classList.add('hidden');
+        if (this.elements.loading) this.elements.loading.classList.add('hidden');
+        // focus the try again button for immediate keyboard access
+        if (this.elements.tryAgainBtn) this.elements.tryAgainBtn.focus();
+    }
+
+    hideUserNotFound() {
+        if (this.elements.notFound) {
+            this.elements.notFound.classList.add('hidden');
+            this.elements.notFound.classList.remove('show');
+        }
+        // Keep hero content intact — we're overlaying the not-found modal for context
+        if (this.elements.input) {
+            this.elements.input.value = '';
+            this.elements.input.focus();
+        }
     }
 
     renderSlides() {
@@ -423,7 +466,6 @@ class UIController {
 
             container.innerHTML = `
                 <div class="story-export-layout">
-                    <div class="story-header"><img src="assets/gitshame.png" alt="gitshame 2025" class="story-logo-img"/></div>
                     <div class="story-main">
                         <img src="${this.state.userData.avatar_url}" class="story-avatar" crossorigin="anonymous">
                         <h2 class="story-username">@${this.state.userData.login}</h2>

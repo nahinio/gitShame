@@ -11,8 +11,8 @@
     --font-value: 'Bebas Neue', sans-serif;
     --spacing-unit: 8px;
     /* Logo sizing — exact responsive widths for consistent appearance */
-    --logo-width-desktop: 240px;
-    --logo-width-tablet: 160px;
+    --logo-width-desktop: 300px;
+    --logo-width-tablet: 180px;
     --logo-width-mobile: 120px;
     --logo-size-story: clamp(64px, 8vw, 140px);
     --logo-size-export: 0px; /* export should not show logo */
@@ -31,9 +31,7 @@
     max-width: 600px;
     /* Mobile focused max-width */
     margin: 0 auto;
-    --logo-width-desktop: 220px;
-    --logo-width-tablet: 140px;
-    --logo-width-mobile: 64px;
+    /* #app does not override root logo sizing — keep global sizes */
 }
 
 .warning-banner {
@@ -110,7 +108,7 @@
 .logo-img {
     display: block;
     margin: 0 auto;
-    width: clamp(var(--logo-width-mobile), 12vw, var(--logo-width-desktop));
+    width: clamp(var(--logo-width-mobile), 10vw, var(--logo-width-desktop));
     height: auto;
     object-fit: contain;
     transition: width 160ms ease;
@@ -168,7 +166,8 @@
 .export-logo-img { max-width: var(--logo-size-export); height: auto; display: none !important; }
 
 /* Ensure exports never render site UI logos (safety net) */
-.export-layout .logo-img, .export-layout .logo-link, .export-layout .export-logo-img {
+.export-layout .logo-img, .export-layout .logo-link, .export-layout .export-logo-img,
+.story-export-layout .logo-img, .story-export-layout .logo-link, .story-export-layout .story-logo-img {
     display: none !important;
 }
 
@@ -254,6 +253,101 @@ input[type="text"]:focus {
 
 .hidden {
     display: none !important;
+}
+
+/* User Not Found styles */
+.not-found {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 120;
+    pointer-events: auto;
+    background: rgba(0,0,0,0.18); /* subtle dim to keep UI context */
+    padding: 20px;
+}
+/* single .not-found-inner block defined below */
+.not-found-inner {
+    gap: 18px;
+}
+.not-found-inner {
+    max-width: 520px;
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 20px 26px;
+    border-radius: 14px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+    transform: translateY(6px) scale(1);
+    transition: transform 240ms cubic-bezier(0.2,0.9,0.2,1), opacity 220ms ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+.not-found-inner > * { position: relative; z-index: 1; }
+.not-found.show .not-found-inner { transform: translateY(0) scale(1); opacity: 1; }
+
+/* Subtle pop-in */
+@keyframes nf-pop {
+    from { transform: translateY(10px) scale(0.98); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.not-found.show .not-found-inner { animation: nf-pop 320ms cubic-bezier(0.2,0.9,0.2,1) both; }
+.not-found-graphic, .not-found-graphic svg, .not-found-graphic img, .not-found-graphic .not-found-image { display:none !important; }
+.not-found-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 6vw, 3rem);
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: 700;
+    text-align: center;
+    background-image: linear-gradient(90deg, var(--accent-red), var(--accent-orange));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent; /* Safari/Chrome */
+    /* fallback for browsers without text-clip support */
+    filter: none;
+} 
+
+.not-found-inner > * { position: relative; z-index: 1; }
+.not-found-desc { 
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2.6vw, 1.15rem);
+    margin: 0; 
+    margin-top: 6px;
+    font-family: var(--font-main);
+    letter-spacing: 0.2px;
+    opacity: 0.95;
+    text-align: center;
+}
+
+.not-found-actions { display:flex; gap: 14px; align-items:center; justify-content:center; margin-top: 14px; }
+.not-found .icon-btn { width: 48px; height: 48px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--accent-red); border: none; box-shadow: none; cursor: pointer; transition: transform 140ms ease, color 140ms ease; }
+.not-found .icon-btn svg { stroke: currentColor; fill: none; stroke-width: 2; width: 20px; height: 20px; }
+.not-found .icon-btn:hover { transform: translateY(-1px) scale(1.03); color: var(--accent-orange); }
+.not-found .icon-btn:active { transform: translateY(0) scale(1.01); }
+.not-found .icon-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,75,75,0.06); }
+.secondary-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.02); color: #fff; }
+.not-found .primary-btn:focus { outline: none; }
+
+@media (max-width: 480px) {
+    .not-found { padding: 14px; }
+    .not-found-inner { padding: 12px; border-radius: 10px; }
+    .not-found-title { font-size: 1.6rem; }
+    .not-found-desc { font-size: 0.95rem; }
+    .not-found .icon-btn { width: 44px; height: 44px; }
+    .not-found .icon-btn svg { width: 18px; height: 18px; }
+    /* Fallback when background-clip not supported */
+    .not-found-title { color: var(--text-primary); -webkit-text-fill-color: initial; }
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
 }
 
 .loader-bar {

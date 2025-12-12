@@ -15,7 +15,7 @@
     "Preparing the shame..."
   ],
   "error_messages": {
-    "user_not_found": "User not found. Check the username and try again.",
+    "user_not_found": "We couldn't find any public activity for that username. Check the spelling or try a different handle.",
     "rate_limit": "GitHub rate limit exceeded. Wait a minute and try again.",
     "empty_year": "Quiet year. Too stealthy. No shame to dish."
   },

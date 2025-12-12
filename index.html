@@ -1052,6 +1052,21 @@
       <p class="loading-text" id="loadingText">Fetching your sins...</p>
     </div>
 
+    <!-- USER NOT FOUND -->
+    <div id="notFound" class="not-found hidden" role="status" aria-live="polite" aria-label="User not found dialog">
+      <div class="not-found-inner">
+        <div class="not-found-text" aria-hidden="false" id="notFoundText">
+          <h2 class="not-found-title">User not found.</h2>
+          <p class="not-found-desc">Zero code. Zero presence.</p>
+        </div>
+        <div class="not-found-actions">
+          <button id="tryAgainBtn" class="icon-btn" aria-label="Try again" title="Try again" type="button">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor" fill="none"><path d="M21 12a9 9 0 1 0-3 6.24" /><polyline points="21 4 21 10 15 10" /></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- RESULTS -->
     <div class="results-screen hidden" id="resultsScreen">
       <button class="btn-restart" id="restartBtn" title="Start Over">
@@ -1388,6 +1403,8 @@
             downloadBtn: document.getElementById("downloadBtn"),
             restartBtn: document.getElementById("restartBtn"),
             export: document.getElementById("exportContainer"),
+            notFound: document.getElementById("notFound"),
+            tryAgainBtn: document.getElementById("tryAgainBtn"),
           };
           this.state = { stats: null, user: null, roast: null };
           this.loadingMsgs = [
@@ -1406,10 +1423,18 @@
           });
           this.els.downloadBtn.addEventListener("click", () => this.download());
           this.els.restartBtn.addEventListener("click", () => this.restart());
+          if (this.els.tryAgainBtn) {
+            this.els.tryAgainBtn.addEventListener("click", () => {
+              this.hideNotFound();
+              this.restart();
+            });
+          }
+          
         }
 
         restart() {
           this.els.results.classList.add("hidden");
+          if (this.els.notFound) this.els.notFound.classList.add("hidden");
           document.getElementById("app").classList.remove("hidden");
           this.els.input.value = "";
           this.els.input.focus();
@@ -1425,7 +1450,13 @@
           const result = await fetcher.fetchAll();
 
           if (!result.success) {
-            alert(result.error);
+            // Show a user-friendly not-found UI for common errors
+            if (result.error === "User not found" || result.error === "Rate limited") {
+              this.showNotFound(result.error);
+            } else {
+              // Fallback to a lightweight toast-style message when other issues occur
+              this.showNotFound(result.error || "Network error");
+            }
             this.hideLoading();
             return;
           }
@@ -1447,6 +1478,7 @@
 
         showLoading() {
           document.getElementById("app").classList.add("hidden");
+          if (this.els.notFound) this.els.notFound.classList.add("hidden");
           this.els.loading.classList.remove("hidden");
           let i = 0;
           this.loadingInterval = setInterval(() => {
@@ -1468,6 +1500,21 @@
             origin: { y: 0.6 },
             colors: ["#ff3b3b", "#a855f7", "#22d3ee"],
           });
+        }
+
+        showNotFound(errorText) {
+          // Keep the app visible and overlay the not-found card so the page context stays relevant
+          if (this.els.results) this.els.results.classList.add("hidden");
+          this.els.notFound.classList.remove("hidden");
+          this.els.notFound.classList.add("show");
+          if (this.els.tryAgainBtn) this.els.tryAgainBtn.focus();
+        }
+
+        hideNotFound() {
+          this.els.notFound.classList.add("hidden");
+          this.els.notFound.classList.remove("show");
+          // Keep app visibility untouched; just restore focus to input
+          if (this.els.input) this.els.input.focus();
         }
 
         renderHeatmap(data, cellClass = "heat-cell") {
